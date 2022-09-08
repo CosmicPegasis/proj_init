@@ -23,16 +23,26 @@ SUCCESS="${Green}[SUCCESS]${Color_Off}: "
 
 # --- Script Start ---
 which cmake &> /dev/null || echo -e "${FATAL}cmake executable not found. Please install cmake and check your PATH variable."
-
-[ -z $1 ] && echo "${INFO}Initialising project in current directory"  || echo "${INFO}Intialising project in $1 sub directory."; mkdir $1 &> /dev/null ; cd $1
-
 which vcpkg &> /dev/null || echo -e "${FATAL}vcpkg executable not found. Please install vcpkg and check your PATH variable."
+
+[ -z $1 ] && echo "${INFO}Initialising project in current directory"  || 
+[ -z $1 ] || mkdir 
+
+if [ -z $1 ]; then
+    echo "${INFO}Initialising project in current directory"
+else
+    echo "${INFO}Intialising project in $1 sub directory."
+    mkdir $1 &> /dev/null
+    cd $1
+fi
+
 
 echo -e "${INFO}Making sub-directories."
 {
 mkdir lib
 mkdir src
 mkdir test
+mkdir include
 } &> /dev/null
 
 echo -e "${INFO}Writing default CMakeLists.txt files."
@@ -43,10 +53,11 @@ set(CMAKE_TOOLCHAIN_FILE $HOME/.local/share/vcpkg/scripts/buildsystems/vcpkg.cma
 set(CMAKE_BUILD_TYPE Debug)
 
 
-project($(basename $(dirname $(pwd))))
+project($(basename $(pwd)))
 add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(test)
+add_subdirectory(include)
 EOF
 
 echo -e "${INFO}Writing default main.cpp file."
@@ -67,12 +78,15 @@ EOF
 
 cat > test/CMakeLists.txt <<EOF
 add_executable(tests tests.cpp)
+target_include_directories(tests PRIVATE \${PROJECT_SOURCE_DIR})
 
 find_package(GTest CONFIG REQUIRED)
     target_link_libraries(tests PRIVATE GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
 EOF
 
 cat > lib/CMakeLists.txt <<EOF
+EOF
+cat > include/CMakeLists.txt <<EOF
 EOF
 
 echo -e "${INFO}Writing .clang-format file with Microsoft default style."
@@ -92,4 +106,4 @@ ln -s build/compile_commands.json compile_commands.json
 
 echo -e "\n${SUCCESS}All done and dusted.\n\n"
 
-[ -z "$1" ] || echo -e "\t${Green}cd $1 to start!\n"
+[ -z "$1" ] || echo -e "\t${Green}cd $1 to start!${Color_Off}\n"
