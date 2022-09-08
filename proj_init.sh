@@ -25,8 +25,7 @@ SUCCESS="${Green}[SUCCESS]${Color_Off}: "
 which cmake &> /dev/null || echo -e "${FATAL}cmake executable not found. Please install cmake and check your PATH variable."
 which vcpkg &> /dev/null || echo -e "${FATAL}vcpkg executable not found. Please install vcpkg and check your PATH variable."
 
-[ -z $1 ] && echo "${INFO}Initialising project in current directory"  || 
-[ -z $1 ] || mkdir 
+[ -z $1 ] && echo "${INFO}Initialising project in current directory"
 
 if [ -z $1 ]; then
     echo "${INFO}Initialising project in current directory"
